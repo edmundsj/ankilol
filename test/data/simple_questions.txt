@@ -1,0 +1,7 @@
+What special python method implements addition?
+	__add__
+What special python method implements equality?
+  __eq__
+This line contains nothing.
+
+
