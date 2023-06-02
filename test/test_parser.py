@@ -8,6 +8,16 @@ def test_is_answer():
     assert is_answer(line)
 
 
+def test_is_answer_list():
+    line = '* This is an answer'
+    assert is_answer(line)
+
+
+def test_is_answer_list_hyphen():
+    line = '- This is an answer'
+    assert is_answer(line)
+
+
 def test_is_question():
     line = 'This is a question'
     assert not is_answer(line)

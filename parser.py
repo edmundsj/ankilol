@@ -41,7 +41,8 @@ def extract_entries(filename: str) -> (list[Entry], list[Entry]):
 
 
 def is_answer(line: str) -> bool:
-    if line.startswith('\t') or line.startswith('  '):
+    valid_starts = ['\t', '  ', '* ', '-']
+    if any([line.startswith(start) for start in valid_starts]):
         return True
     else:
         return False
