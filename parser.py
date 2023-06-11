@@ -1,18 +1,13 @@
-import typing
-from collections import namedtuple
-from typing import TextIO, Callable, Any, TypeVar, Generic
+from typing import Callable, Any
 from abc import ABC
 
 import bs4
 from bs4 import BeautifulSoup
 
-Entry = namedtuple('Entry', ['question', 'answer'])
+from definitions import Entry, HTML_ANSWER_OUTER_TAG
 
 
 class GenericParser(ABC):
-    def write_entries(self, entries: list[Entry]):
-        pass
-
     def extract_entries(self)-> (list[Entry], list[Entry]):
         pass
 
@@ -49,9 +44,6 @@ class HTMLParser(GenericParser):
     def __init__(self, filename: str):
         self.filename = filename
 
-    def write_entries(self, entries: list[Entry]):
-        pass
-
     def extract_entries(self) -> (list[Entry], list[Entry]):
         with open(self.filename, 'r') as fh:
             soup = BeautifulSoup(fh, 'html.parser')
@@ -63,7 +55,7 @@ class HTMLParser(GenericParser):
         pass
 
     def _is_answer(self, line: bs4.Tag):
-        if line.name == 'ul':
+        if line.name == HTML_ANSWER_OUTER_TAG:
             return True
         return False
 
@@ -80,20 +72,10 @@ class TextParser(GenericParser):
     def __init__(self, filename: str):
         self.filename = filename
 
-    def write_entries(self, entries: list[Entry]) -> None:
-        with open(self.filename, 'w') as file:
-            for entry in entries:
-                self._write_entry(file, entry)
-
     def extract_entries(self) -> (list[Entry], list[Entry]):
         with open(self.filename, 'r') as file:
             lines = [line for line in file if line != '\n']
             return extract_entries(lines, self._is_answer, self._parse_question, self._parse_answer)
-
-    def _write_entry(self, file: TextIO, entry: Entry):
-        file.write(entry.question + '\n')
-        if entry.answer is not None:
-            file.write('\t' + entry.answer + '\n')
 
     def _is_answer(self, line: str) -> bool:
         valid_starts = ['\t', '  ', '* ', '-']
@@ -101,10 +83,6 @@ class TextParser(GenericParser):
             return True
         else:
             return False
-
-    def _get_num_lines(self) -> int:
-        with open(self.filename, 'r') as file:
-            return sum(1 for line in file)
 
     def _parse_question(self, question: str) -> str:
         return question.removesuffix('\n')

@@ -1,7 +1,8 @@
 import os.path
 import pytest
 
-from ..parser import Entry, TextParser
+from ..parser import TextParser
+from definitions import Entry
 
 
 @pytest.fixture

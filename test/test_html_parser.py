@@ -1,7 +1,8 @@
 import os.path
 import pytest
 
-from ..parser import GenericParser, Entry, TextParser, HTMLParser
+from ..parser import GenericParser, TextParser, HTMLParser
+from definitions import Entry
 from bs4 import BeautifulSoup
 
 @pytest.fixture
