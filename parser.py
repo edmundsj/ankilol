@@ -1,13 +1,18 @@
+import typing
+from pathlib import Path
 from typing import Callable, Any
 from abc import ABC
 
 import bs4
 from bs4 import BeautifulSoup
 
-from definitions import Entry, HTML_ANSWER_OUTER_TAG
+from .definitions import Entry, HTML_ANSWER_OUTER_TAG
 
 
 class GenericParser(ABC):
+    def __init__(self, filename: str | Path):
+        pass
+
     def extract_entries(self)-> (list[Entry], list[Entry]):
         pass
 
@@ -92,3 +97,12 @@ class TextParser(GenericParser):
         for prefix in self.ANSWER_PREFIXES:
             stripped_answer = stripped_answer.removeprefix(prefix)
         return stripped_answer.removesuffix('\n')
+
+
+def get_parser_class(filename: str | Path) -> typing.Type[GenericParser]:
+    if '.html' in filename:
+        return HTMLParser
+    elif '.txt' in filename:
+        return TextParser
+    else:
+        raise NotImplementedError('Only supported file extensions are .txt and .html')

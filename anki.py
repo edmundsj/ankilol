@@ -1,7 +1,7 @@
 import json
 import logging
 import urllib.request
-from types import Entry
+from .definitions import Entry
 
 BASE_URL = 'http://localhost:8765'
 

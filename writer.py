@@ -1,12 +1,15 @@
 from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
+import typing
 from abc import ABC
 from typing import TextIO
-from definitions import Entry, HTML_ANSWER_OUTER_TAG, HTML_ANSWER_INNER_TAG
+from .definitions import Entry, HTML_ANSWER_OUTER_TAG, HTML_ANSWER_INNER_TAG
 
 
 class GenericWriter(ABC):
+    def __init__(self, filename: str | Path):
+        pass
     def append(self, entries: list[Entry]):
         pass
 
@@ -15,8 +18,8 @@ class GenericWriter(ABC):
 
 
 class HTMLWriter(GenericWriter):
-    def __init__(self, output_filename: str | Path):
-        self.filename = output_filename
+    def __init__(self, filename: str | Path):
+        self.filename = filename
 
     def write(self, entries):
         with open(self.filename, 'w+') as file:
@@ -61,8 +64,8 @@ class HTMLWriter(GenericWriter):
 
 
 class TextWriter(GenericWriter):
-    def __init__(self, output_filename: str | Path):
-        self.filename = output_filename
+    def __init__(self, filename: str | Path):
+        self.filename = filename
 
     def write(self, entries):
         with open(self.filename, 'w') as fh:
@@ -77,3 +80,12 @@ class TextWriter(GenericWriter):
         file.write(entry.question + '\n')
         if entry.answer is not None:
             file.write('* ' + entry.answer + '\n')
+
+
+def get_writer_class(filename: str | Path) -> typing.Type[GenericWriter]:
+    if '.html' in filename:
+        return HTMLWriter
+    elif '.txt' in filename:
+        return TextWriter
+    else:
+        raise NotImplementedError('Only supported file extensions are .txt and .html')
