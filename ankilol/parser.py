@@ -6,7 +6,7 @@ from abc import ABC
 import bs4
 from bs4 import BeautifulSoup
 
-from .definitions import Entry, HTML_ANSWER_OUTER_TAG
+from ankilol.definitions import Entry, HTML_ANSWER_OUTER_TAG
 
 
 class GenericParser(ABC):

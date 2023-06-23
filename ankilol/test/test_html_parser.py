@@ -48,3 +48,11 @@ def test_extract_entries_html(html_parser, soup):
 
     assert len(unanswered) == 11
     assert desired_unanswered_entry in unanswered
+
+
+def test_parse_question(html_parser, soup):
+    line = soup.new_tag(name='p')
+    content = 'this is <b>a</b> question'
+    line.string = content
+    parsed_question = html_parser._parse_question(line)
+    assert parsed_question == content

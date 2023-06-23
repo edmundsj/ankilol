@@ -1,7 +1,7 @@
 import json
 import logging
 import urllib.request
-from .definitions import Entry
+from ankilol.definitions import Entry
 
 
 

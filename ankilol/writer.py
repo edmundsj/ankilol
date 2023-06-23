@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup, Tag
 import typing
 from abc import ABC
 from typing import TextIO
-from .definitions import Entry, HTML_ANSWER_OUTER_TAG, HTML_ANSWER_INNER_TAG
+from ankilol.definitions import Entry, HTML_ANSWER_OUTER_TAG, HTML_ANSWER_INNER_TAG
 
 
 class GenericWriter(ABC):
