@@ -55,8 +55,7 @@ class AnkiConnect:
                         "checkAllModels": False
                     }
                 },
-                "tags": [
-                ],
+                "tags": entry.tags,
             }
         }
         logging.info(f'Adding note {entry.question}')
