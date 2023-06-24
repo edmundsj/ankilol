@@ -1,7 +1,9 @@
 import os.path
 import pytest
 
-from ..parser import GenericParser, TextParser, HTMLParser, inner_content
+from ..parser import (
+    GenericParser, TextParser, HTMLParser, inner_content, get_tags_text, get_tags_html, strip_tags_text, strip_tags_html
+)
 from definitions import Entry
 from bs4 import BeautifulSoup
 
@@ -29,6 +31,61 @@ def test_inner_element_extract(html, output):
     content = BeautifulSoup(html, 'html.parser')
     parsed_content = inner_content(content)
     assert str(parsed_content) == str(output)
+
+
+@pytest.mark.parametrize(
+    'text,output',
+    [
+        ('#tag1, hello #tag2', ['#tag1', '#tag2']),
+        ('#tag1', ['#tag1']),
+        ('tag1', []),
+    ]
+)
+def test_get_tags_text(text, output):
+    tags = get_tags_text(text)
+    assert tags == output
+
+
+@pytest.mark.parametrize(
+    'text,output',
+    [
+        ('#tag1, hello #tag2', 'hello'),
+        ('#tag1, hello #tag2 there', 'hello there'),
+        ('#tag1', ''),
+        ('tag1', 'tag1'),
+    ]
+)
+def test_strip_tags_text(text, output):
+    actual_text = strip_tags_text(text)
+    assert actual_text == output
+
+
+@pytest.mark.parametrize(
+    'html,output',
+    [
+        ('<p>#tag1, hello #tag2</p>', ['#tag1', '#tag2']),
+        ('<p>#tag1, hello #tag2 there</p>', ['#tag1', '#tag2']),
+        ('<p>#tag1</p>', ['#tag1']),
+    ]
+)
+def test_get_tags_html(html, output):
+    content = BeautifulSoup(html, 'html.parser')
+    tags = get_tags_html(content)
+    assert tags == output
+
+
+@pytest.mark.parametrize(
+    'html,output',
+    [
+        ('<p>#tag1, hello #tag2</p>', '<p>hello</p>'),
+        ('<p>#tag1, hello #tag2 there</p>', '<p>hello there</p>'),
+        ('<p>#tag1</p>', '<p></p>'),
+    ]
+)
+def test_strip_tags_html(html, output):
+    content = BeautifulSoup(html, 'html.parser')
+    actual_content = strip_tags_html(content)
+    assert str(actual_content) == output
 
 
 
