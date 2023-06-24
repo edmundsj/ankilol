@@ -2,6 +2,7 @@ import typing
 from pathlib import Path
 from typing import Callable, Any
 from abc import ABC
+from copy import copy
 
 import bs4
 from bs4 import BeautifulSoup
@@ -65,10 +66,14 @@ class HTMLParser(GenericParser):
         return False
 
     def _parse_question(self, element: bs4.Tag):
-        return element.text
+        question = copy(inner_content(element))
+        question.attrs.clear()
+        return str(question)
 
     def _parse_answer(self, element: bs4.Tag):
-        return element.text
+        answer = copy(inner_content(element))
+        answer.attrs.clear()
+        return str(answer)
 
 
 class TextParser(GenericParser):
@@ -106,3 +111,10 @@ def get_parser_class(filename: str | Path) -> typing.Type[GenericParser]:
         return TextParser
     else:
         raise NotImplementedError('Only supported file extensions are .txt and .html')
+
+
+def inner_content(outer: bs4.Tag):
+    if len(outer.contents) > 1 or isinstance(outer.contents[0], str):
+        return outer
+    else:
+        return inner_content(outer.contents[0])
