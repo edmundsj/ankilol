@@ -105,12 +105,12 @@ def test_is_question(html_parser, soup):
     assert not html_parser._is_answer(line)
 
 
-def test_extract_entries_html(html_parser, soup):
+def test_extract_entries_html_with_tags(html_parser, soup):
     answered, unanswered = html_parser.extract_entries()
     desired_answered_entry = Entry(
         question='<span>Who said “software’s primary technical imperative is minimizing complexity”?</span>',
         answer='<span>Steve McConnel of Code Complete</span>',
-        tags=[],
+        tags=['#book'],
     )
     desired_unanswered_entry = Entry(
         question='<span>Are Google test suites compiled into a '
@@ -132,4 +132,4 @@ def test_parse_question_with_tag(html_parser, soup):
     content = BeautifulSoup(html, 'html.parser')
     parsed_question = html_parser._parse_question(content)
     desired_question = '''<p>Item 1 is <b>bold</b> and has an [element]</p>'''
-    assert parsed_question == desired_question
+    assert str(parsed_question) == desired_question

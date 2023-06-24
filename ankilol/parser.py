@@ -24,6 +24,8 @@ def extract_entries(
         is_answer: Callable[[Any], bool],
         parse_question: Callable[[Any], Any],
         parse_answer: Callable[[Any], Any],
+        get_tags: Callable[[Any], Any],
+        strip_tags: Callable[[Any], Any],
 ) -> (list[Entry], list[Entry]):
     answered_questions = []
     unanswered_questions = []
@@ -32,16 +34,25 @@ def extract_entries(
     for index, line in enumerate(iterable):
         is_last_line = index == len(iterable) - 1
         if is_answer(line):
-            new_entry = Entry(question=current_question, answer=parse_answer(line), tags=[])
+            answer = parse_answer(line)
+
+            question_tags = get_tags(current_question)
+            answer_tags = get_tags(answer)
+            tags = question_tags + answer_tags
+
+            answer = strip_tags(answer)
+            current_question = strip_tags(current_question)
+
+            new_entry = Entry(question=str(current_question), answer=str(answer), tags=tags)
             answered_questions.append(new_entry)
             current_question = None
         elif not is_answer(line) and not is_last_line:
             if current_question is not None:
-                new_entry = Entry(question=current_question, answer=None, tags=[])
+                new_entry = Entry(question=str(current_question), answer=None, tags=[])
                 unanswered_questions.append(new_entry)
             current_question = parse_question(line)
         elif not is_answer(line) and is_last_line:
-            new_entry = Entry(question=parse_question(line), answer=None, tags=[])
+            new_entry = Entry(question=str(parse_question(line)), answer=None, tags=[])
             unanswered_questions.append(new_entry)
 
     return answered_questions, unanswered_questions
@@ -58,7 +69,14 @@ class HTMLParser(GenericParser):
             entries = []
             if body is not None:
                 entries = [element for element in body.find_all(recursive=False)]
-            return extract_entries(entries, self._is_answer, self._parse_question, self._parse_answer)
+            return extract_entries(
+                entries,
+                is_answer=self._is_answer,
+                parse_question=self._parse_question,
+                parse_answer=self._parse_answer,
+                get_tags=self._get_tags,
+                strip_tags=self._strip_tags,
+            )
         pass
 
     def _is_answer(self, line: bs4.Tag):
@@ -69,12 +87,20 @@ class HTMLParser(GenericParser):
     def _parse_question(self, element: bs4.Tag):
         question = inner_content(element)
         question.attrs.clear()
-        return str(question)
+        return question
 
     def _parse_answer(self, element: bs4.Tag):
         answer = inner_content(element)
         answer.attrs.clear()
-        return str(answer)
+        return answer
+
+    def _get_tags(self, element: bs4.Tag) -> list[str]:
+        tags = get_tags_html(element)
+        return tags
+
+    def _strip_tags(self, element: bs4.Tag) -> list[str]:
+        elem = strip_tags_html(element)
+        return elem
 
 
 class TextParser(GenericParser):
@@ -86,7 +112,14 @@ class TextParser(GenericParser):
     def extract_entries(self) -> (list[Entry], list[Entry]):
         with open(self.filename, 'r') as file:
             lines = [line for line in file if line != '\n']
-            return extract_entries(lines, self._is_answer, self._parse_question, self._parse_answer)
+            return extract_entries(
+                lines,
+                is_answer=self._is_answer,
+                parse_question=self._parse_question,
+                parse_answer=self._parse_answer,
+                get_tags=self._get_tags,
+                strip_tags=self._strip_tags,
+            )
 
     def _is_answer(self, line: str) -> bool:
         valid_starts = ['\t', '  ', '* ', '-']
@@ -103,6 +136,14 @@ class TextParser(GenericParser):
         for prefix in self.ANSWER_PREFIXES:
             stripped_answer = stripped_answer.removeprefix(prefix)
         return stripped_answer.removesuffix('\n')
+
+    def _get_tags(self, entry: str) -> str:
+        tags = get_tags_text(entry)
+        return tags
+
+    def _strip_tags(self, entry: str) -> str:
+        text = strip_tags_text(entry)
+        return text
 
 
 def get_parser_class(filename: str | Path) -> typing.Type[GenericParser]:
