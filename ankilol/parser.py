@@ -32,16 +32,16 @@ def extract_entries(
     for index, line in enumerate(iterable):
         is_last_line = index == len(iterable) - 1
         if is_answer(line):
-            new_entry = Entry(question=current_question, answer=parse_answer(line))
+            new_entry = Entry(question=current_question, answer=parse_answer(line), tags=[])
             answered_questions.append(new_entry)
             current_question = None
         elif not is_answer(line) and not is_last_line:
             if current_question is not None:
-                new_entry = Entry(question=current_question, answer=None)
+                new_entry = Entry(question=current_question, answer=None, tags=[])
                 unanswered_questions.append(new_entry)
             current_question = parse_question(line)
         elif not is_answer(line) and is_last_line:
-            new_entry = Entry(question=parse_question(line), answer=None)
+            new_entry = Entry(question=parse_question(line), answer=None, tags=[])
             unanswered_questions.append(new_entry)
 
     return answered_questions, unanswered_questions

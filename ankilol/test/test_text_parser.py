@@ -34,8 +34,8 @@ def test_is_question(text_parser):
 
 def test_extract_entries_text(text_parser):
     answered, unanswered = text_parser.extract_entries()
-    desired_answered_entry = Entry(question='What special python method implements addition?', answer='__add__')
-    desired_unanswered_entry = Entry(question='This line contains nothing.', answer=None)
+    desired_answered_entry = Entry(question='What special python method implements addition?', answer='__add__', tags=[])
+    desired_unanswered_entry = Entry(question='This line contains nothing.', answer=None, tags=[])
 
     assert len(answered) == 2
     assert desired_answered_entry in answered

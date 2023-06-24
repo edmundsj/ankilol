@@ -109,11 +109,15 @@ def test_extract_entries_html(html_parser, soup):
     answered, unanswered = html_parser.extract_entries()
     desired_answered_entry = Entry(
         question='<span>Who said “software’s primary technical imperative is minimizing complexity”?</span>',
-        answer='<span>Steve McConnel of Code Complete</span>')
+        answer='<span>Steve McConnel of Code Complete</span>',
+        tags=[],
+    )
     desired_unanswered_entry = Entry(
         question='<span>Are Google test suites compiled into a '
         'binary and then run as a standalone executable, or do they interact with another executable?</span>',
-        answer=None)
+        answer=None,
+        tags=[],
+    )
 
     assert len(answered) == 4
     assert desired_answered_entry in answered
